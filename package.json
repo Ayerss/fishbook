@@ -1,0 +1,32 @@
+{
+  "name": "fishbook",
+  "version": "0.0.1",
+  "description": "Command line reading fiction.",
+  "keywords": ["fiction", "novel", "book", "touch fish", "cli"],
+  "bin": {
+    "fishbook": "./bin/fishbook.js"
+  },
+  "license": "MIT",
+  "scripts": {},
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "commander": "^6.2.1",
+    "inquirer": "^7.3.3",
+    "keypress": "^0.2.1"
+  },
+  "author": {
+    "name": "Ayers",
+    "email": "aorgs@outlook.com",
+    "url": "https://github.com/ayerss/fishbook"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ayerss/fishbook.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ayerss/fishbook/issues"
+  },
+  "engines": {
+    "node": ">= 10.0.0"
+  }
+}
