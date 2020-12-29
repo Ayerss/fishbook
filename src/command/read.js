@@ -5,10 +5,13 @@ const chalk = require('chalk');
 const conf = require(global.fishBook.confPath);
 const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
 
-const txtLen = 128;
+let txtLen = (process.stdout.columns - 6) * 1.4;
+let fd;
 
 function read(path, start, cb, sOffset = 0, eOffset = 0) {
   if (start < 0) start = 0;
+  txtLen = Math.round((process.stdout.columns - 6) * 1.4);
+
   const rs = fs.createReadStream(path, {
     flag: 'r',
     encoding: "utf-8",
@@ -38,9 +41,12 @@ function read(path, start, cb, sOffset = 0, eOffset = 0) {
       }
       else {
         readline.clearLine(process.stdout, 0);
-        readline.cursorTo(process.stdout, 0);
+        readline.cursorTo(process.stdout, 0, fd);
 
-        process.stdout.write(txt.replace(/[\n|\r]/g, ''), 'utf-8');
+        process.stdout.write(
+          txt.replace(/[\n|\r]/g, '').replace(/\s+/g, ' '),
+          'utf-8'
+        );
         cb(start + sOffset + txtLen + eOffset, start + sOffset);
       }
     })
@@ -56,6 +62,7 @@ module.exports = () => {
   const _conf = conf.book[conf.current];
   let start = _conf.current;
   let oldStart = start;
+  fd = process.stdin.fd;
 
   read(_conf.path, start, function (s, o) {
     isEnd(s, _conf.total);

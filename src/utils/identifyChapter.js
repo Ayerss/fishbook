@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const reg = /第(.+)[章回卷节折篇幕集]\s(.+)\s/;
+const reg = /第(.+)[章回卷节折篇幕集](.+)\s/;
 
 const chapter = [];
 

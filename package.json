@@ -1,8 +1,13 @@
 {
   "name": "fishbook",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Command line reading fiction.",
-  "keywords": ["fiction", "novel", "book", "touch fish", "cli"],
+  "keywords": [
+    "fiction",
+    "novel",
+    "book",
+    "touch fish"
+  ],
   "bin": {
     "fishbook": "./bin/fishbook.js"
   },

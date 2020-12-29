@@ -27,13 +27,14 @@ program
 program
   .command('chapter [page]')
   .description('查看目录')
-  .action(function (options) {
-    require(global.fishBook.srcPath + '/command/chapter.js')(options);
+  .option('-s, --search <chapterName>', '模糊搜索章节')
+  .action(function (page = 1, option) {
+    require(global.fishBook.srcPath + '/command/chapter.js')(page, option.search);
   });
 
 program
   .command('bookshelf [book]')
-  .option('-d, --delete', '删除书籍')
+  .option('-d, --delete [bool]', '删除书籍')
   .description('切换书籍')
   .action(function (name, option) {
     require(global.fishBook.srcPath + '/command/bookshelf.js')(name, !!option.delete);

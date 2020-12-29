@@ -8,15 +8,20 @@ const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
 const log = console.log;
 
 module.exports = function (formPath) {
+  const isRelativePath = formPath.indexOf('/') === 0 ? false : true;
+
+  if (isRelativePath) {
+    formPath = path.resolve(process.cwd(), formPath);
+  }
 
   if (fs.existsSync(formPath) === false) {
-    log(chalk.red('\u26A0  未查询到书籍!'));
+    log(chalk.red('\u26A0 未查询到书籍!'));
     return
   }
 
   const extname = path.extname(formPath);
   if (extname !== '.txt') {
-    log(chalk.red('\u26A0  不是txt文本!'));
+    log(chalk.red('\u26A0 不是txt文本!'));
     return
   }
 
@@ -108,7 +113,7 @@ function exportConf (toPath) {
       };
       saveConf(global.fishBook.confPath, conf);
       load.close();
-      log(chalk.green(`\u2728  识别到${chapterLength}个章节`));
+      log(chalk.green(`\u2728 识别到${chapterLength}个章节`));
     });
 }
 

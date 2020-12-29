@@ -41,7 +41,7 @@ async function selectChapter(page) {
 
   const { index } = await inquirer.prompt({
     type: 'list',
-    message: '请选择一章节:',
+    message: '请选择章节:',
     name: 'index',
     pageSize: 12,
     choices
@@ -57,12 +57,31 @@ async function selectChapter(page) {
 
 }
 
-module.exports = function (page = 1) {
+module.exports = function (page, search) {
   if (conf.current) {
     chapter = require(conf.book[conf.current]['chapterPath']);
-    selectChapter(page).then(() => {});
+    if (search) {
+      searchChapter(search);
+    } else {
+      selectChapter(page).then(() => {});
+    }
   } else {
     console.log(chalk.red('\u26A0  未找到书籍, 请使用[fishbook add]添加书籍'));
     return
   }
 };
+
+function searchChapter(name) {
+  const choices = chapter.filter(item => item.name.includes(name));
+  const pageSize = process.stdout.rows > 10 ? process.stdout.rows - 5 : 5;
+  inquirer.prompt({
+    type: 'list',
+    message: '请选择章节:',
+    name: 'value',
+    pageSize,
+    choices
+  }).then(({value}) => {
+    conf.book[conf.current]['current'] = value;
+    saveConf(global.fishBook.confPath, conf);
+  });
+}
