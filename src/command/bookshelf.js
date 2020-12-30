@@ -1,7 +1,7 @@
 const fs = require('fs');
 const chalk = require('chalk');
 const inquirer = require('inquirer');
-const conf = require(global.fishBook.confPath);
+const conf = require(global.fishBook.bookshelfPath);
 const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
 
 const log = console.log;
@@ -18,7 +18,7 @@ function selectBook(isDel) {
       deleteBook(name);
     } else {
       conf.current = name;
-      saveConf(global.fishBook.confPath, conf);
+      saveConf(global.fishBook.bookshelfPath, conf);
       log(chalk.green(`\u2728  切换成功!`));
     }
   });
@@ -30,7 +30,7 @@ function deleteBook(book) {
   if (conf.current === book) {
     conf.current = Object.keys(conf.book)[0] || '';
   }
-  saveConf(global.fishBook.confPath, conf);
+  saveConf(global.fishBook.bookshelfPath, conf);
   fs.unlink(path, () => {});
   fs.unlink(chapterPath, () => {});
   log(chalk.green(`\u2728  删除成功!`));
@@ -45,7 +45,7 @@ module.exports = function (book, isDel) {
         deleteBook(book);
       } else {
         conf.current = book;
-        saveConf(global.fishBook.confPath, conf);
+        saveConf(global.fishBook.bookshelfPath, conf);
         log(chalk.green(`\u2728  切换成功!`));
       }
     } else {

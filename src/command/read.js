@@ -2,7 +2,7 @@ const fs = require('fs');
 const keypress = require('keypress');
 const readline = require('readline');
 const chalk = require('chalk');
-const conf = require(global.fishBook.confPath);
+const conf = require(global.fishBook.bookshelfPath);
 const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
 
 let txtLen = (process.stdout.columns - 6) * 1.4;
@@ -96,7 +96,7 @@ module.exports = () => {
 
 function save(start) {
   conf.book[conf.current]['current'] = start;
-  saveConf(global.fishBook.confPath, conf);
+  saveConf(global.fishBook.bookshelfPath, conf);
   console.log('\r');
   console.log(chalk.green('\u{1F516} 已保存阅读记录'));
 }

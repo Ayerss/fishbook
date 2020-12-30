@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
 const chalk = require('chalk');
-const conf = require(global.fishBook.confPath);
+const conf = require(global.fishBook.bookshelfPath);
 const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
 
 let chapter;
@@ -51,7 +51,7 @@ async function selectChapter(page) {
     return await selectChapter(index === -1 ? page - 1 : page + 1);
   } else {
     conf.book[conf.current]['current'] = chapter[index]['value'];
-    saveConf(global.fishBook.confPath, conf);
+    saveConf(global.fishBook.bookshelfPath, conf);
     return
   }
 
@@ -82,6 +82,6 @@ function searchChapter(name) {
     choices
   }).then(({value}) => {
     conf.book[conf.current]['current'] = value;
-    saveConf(global.fishBook.confPath, conf);
+    saveConf(global.fishBook.bookshelfPath, conf);
   });
 }

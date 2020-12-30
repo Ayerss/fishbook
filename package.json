@@ -9,7 +9,7 @@
     "touch fish"
   ],
   "bin": {
-    "fishbook": "./bin/fishbook.js"
+    "fish": "./bin/fishbook.js"
   },
   "license": "MIT",
   "scripts": {},

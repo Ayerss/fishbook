@@ -90,7 +90,7 @@ function parsed(formPath, toPath) {
 }
 
 function exportConf (toPath) {
-  const conf = require(global.fishBook.confPath);
+  const conf = require(global.fishBook.bookshelfPath);
   const load = loading();
   const filename = path.basename(toPath).replace('.txt', '');
   const chapterPath = path.resolve(global.fishBook.chapterPath, filename + '.json');
@@ -111,7 +111,7 @@ function exportConf (toPath) {
         current: 0,
         total: stats.size
       };
-      saveConf(global.fishBook.confPath, conf);
+      saveConf(global.fishBook.bookshelfPath, conf);
       load.close();
       log(chalk.green(`\u2728 识别到${chapterLength}个章节`));
     });
