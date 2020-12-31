@@ -1,6 +1,6 @@
 {
   "name": "fishbook",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Command line reading fiction.",
   "keywords": [
     "fiction",
@@ -9,7 +9,7 @@
     "touch fish"
   ],
   "bin": {
-    "fish": "./bin/fishbook.js"
+    "fishbook": "./bin/fishbook.js"
   },
   "license": "MIT",
   "scripts": {},

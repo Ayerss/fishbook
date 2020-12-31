@@ -5,12 +5,26 @@ const chalk = require('chalk');
 const conf = require(global.fishBook.bookshelfPath);
 const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
 
-let txtLen = (process.stdout.columns - 6) * 1.4;
+const { readingDisplayNumberAuto, readingDisplayNumber } = (() => {
+  const { settings } = require(global.fishBook.confPath);
+  return {
+    readingDisplayNumberAuto: settings.readingDisplayNumberAuto.value,
+    readingDisplayNumber: settings.readingDisplayNumber.value
+  }
+})();
+
+let txtLen = Math.round(readingDisplayNumberAuto
+  ? (process.stdout.columns - 6) * 1.5
+  : readingDisplayNumber * 2.9
+);
+
 let fd;
 
 function read(path, start, cb, sOffset = 0, eOffset = 0) {
   if (start < 0) start = 0;
-  txtLen = Math.round((process.stdout.columns - 6) * 1.4);
+  if (readingDisplayNumberAuto) {
+    txtLen = Math.round((process.stdout.columns - 6) * 1.5);
+  }
 
   const rs = fs.createReadStream(path, {
     flag: 'r',
@@ -63,6 +77,8 @@ module.exports = () => {
   let start = _conf.current;
   let oldStart = start;
   fd = process.stdin.fd;
+
+  console.clear();
 
   read(_conf.path, start, function (s, o) {
     isEnd(s, _conf.total);

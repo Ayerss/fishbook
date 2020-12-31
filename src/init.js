@@ -3,11 +3,35 @@ const fs = require('fs');
 const {homedir} = require('os');
 
 const srcPath = __dirname;
-const fishBookPath = path.resolve(homedir(), 'fishBook');
+const fishBookPath = path.resolve(homedir(), '.fishBook');
 const confPath = path.resolve(fishBookPath, 'fishBook.json');
 const bookshelfPath = path.resolve(fishBookPath, 'bookshelf.json');
 const bookPath = path.resolve(fishBookPath, 'book');
-const chapterPath = path.resolve(fishBookPath, 'chapter');
+const chapterPath = path.resolve(fishBookPath, '.chapter');
+
+const defaultConf = {
+  version: '1.0.0',
+  checkVersion: {
+    lastTimestamp: 0,
+    latest: '0.0.4'
+  },
+  settings: {
+    readingDisplayNumberAuto: {
+      name: "readingDisplayNumberAuto",
+      description: "阅读时是否一行显示",
+      message: '是否一行显示:',
+      value: true,
+      type: 'confirm'
+    },
+    readingDisplayNumber: {
+      name: "readingDisplayNumber",
+      description: "设置阅读时显示的字数",
+      message: '请输入字数:',
+      value: 0,
+      type: 'number'
+    }
+  }
+}
 
 module.exports = function () {
   if (fs.existsSync(fishBookPath) === false) {
@@ -48,33 +72,13 @@ module.exports = function () {
       );
       fs.writeFileSync(
         confPath,
-        JSON.stringify({
-          version: '1.0.0',
-          checkVersion: {         // 检查版本
-            lastTimestamp: 0,     // 最后一次检查的时间戳
-            latest: '0.0.4'       // 最后一个的版本
-          },
-          read: {
-            countAuth: true,
-            count: '',
-          }
-        }, null, 2)
+        JSON.stringify(defaultConf, null, 2)
       );
     }
   } else {
     fs.writeFileSync(
       confPath,
-      JSON.stringify({
-        version: '1.0.0',
-        checkVersion: {
-          lastTimestamp: 0,
-          latest: '0.0.4'
-        },
-        read: {
-          countAuth: true,
-          count: '',
-        }
-      }, null, 2)
+      JSON.stringify(defaultConf, null, 2)
     );
   }
 
