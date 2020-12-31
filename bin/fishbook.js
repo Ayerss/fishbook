@@ -39,6 +39,13 @@ checkVersion().then((status) => {
       });
 
     program
+      .command('setting')
+      .description('设置')
+      .action(function () {
+        require(global.fishBook.srcPath + '/command/setting.js')();
+      });
+
+    program
       .version(version, '-v, --version')
       .parse(process.argv);
   }
