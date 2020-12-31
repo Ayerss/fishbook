@@ -6,7 +6,7 @@ const init = require('../src/init');
 const checkVersion = require('../src/checkVersion');
 
 init();
-checkVersion().then((status) => {
+checkVersion().then(status => {
   if (status) {
     program
       .command('add <path>')
