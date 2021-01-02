@@ -5,7 +5,7 @@ const {version} = require(path.resolve(__dirname, '..', 'package.json'));
 
 function getVersion() {
   return axios.get('http://registry.npmjs.org/fishbook').then(res => {
-    return res.data['dist-tags']['latest:'];
+    return res.data['dist-tags']['latest'];
   });
 }
 
