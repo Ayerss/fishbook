@@ -1,9 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
+const chardet = require('chardet');
+const iconv = require('iconv-lite');
 const loading = require(global.fishBook.srcPath + '/utils/loading.js');
 const identifyChapter = require(global.fishBook.srcPath + '/utils/identifyChapter.js');
 const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
+const _fs = require(global.fishBook.srcPath + '/utils/fs-promise.js');
 
 const log = console.log;
 
@@ -48,40 +51,29 @@ module.exports = function (formPath) {
   }
 }
 
-function copyFile(formPath, toPath) {
-  const readable = fs.createReadStream(formPath);
+async function copyFile(formPath, toPath) {
+  const encoding = await chardet.detectFile(formPath);
+  let data = await _fs.readFile(formPath);
+  if(encoding === "Big5" || encoding === "GB18030" ){
+    data = iconv.decode(data, 'gbk');
+  } else if(encoding === 'uft-8') {
 
-  const writable = fs.createWriteStream(toPath);
-
-  readable.pipe(writable);
-
-  return new Promise((resolve, reject) => {
-
-    readable.on('end', () => {
-      writable.close();
-    });
-
-    readable.on('error', (e) => {
-      reject(e.message);
-    });
-
-    writable.on('close', () => {
-      resolve();
-    });
-
-  });
+  } else {
+    return new Error(`不支持${encoding}编码`);
+  }
+  await _fs.writeFile(toPath, data);
+  return Buffer.byteLength(data);
 }
 
 function parsed(formPath, toPath) {
   const load = loading();
 
   copyFile(formPath, toPath)
-    .then(() => {
+    .then((size) => {
       load.close();
       log(chalk.green(`\u{1F4E6} 复制完成`));
-    })
-    .then(() => {
-      exportConf(toPath);
+
+      exportConf(toPath, size);
     })
     .catch(err => {
       load.close();
@@ -89,10 +81,10 @@ function parsed(formPath, toPath) {
     });
 }
 
-function exportConf (toPath) {
+function exportConf (toPath, size) {
   const conf = require(global.fishBook.bookshelfPath);
   const filename = path.basename(toPath).replace('.txt', '');
-  const chapterPath = path.resolve(global.fishBook.chapterPath, filename + '.json');
+  const chapterPath = global.fishBook.chapterPath + '/' + filename + '.json';
   // const load = loading();
   console.time('\u23F1');
   identifyChapter(toPath)
@@ -102,7 +94,6 @@ function exportConf (toPath) {
     })
     .then(chapterLength => {
       console.timeEnd('\u23F1');
-      const stats = fs.statSync(toPath);
       conf.current = filename;
       conf.book[filename] = {
         name: filename,
@@ -110,7 +101,7 @@ function exportConf (toPath) {
         chapterPath,
         chapterLength,
         current: 0,
-        total: stats.size
+        total: size
       };
       saveConf(global.fishBook.bookshelfPath, conf);
       // load.close();

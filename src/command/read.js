@@ -5,13 +5,26 @@ const chalk = require('chalk');
 const conf = require(global.fishBook.bookshelfPath);
 const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
 
-const { readingDisplayNumberAuto, readingDisplayNumber } = (() => {
+const {
+  readingDisplayNumberAuto,
+  readingDisplayNumber,
+  readingColor,
+  readingAutoPageTurn
+} = (() => {
   const { settings } = require(global.fishBook.confPath);
-  return {
-    readingDisplayNumberAuto: settings.readingDisplayNumberAuto.value,
-    readingDisplayNumber: settings.readingDisplayNumber.value
-  }
+  return Object.keys(settings).reduce((o, key) => {
+    o[key] = settings[key]['value'];
+    return o;
+  }, {});
 })();
+
+console.log(
+  readingDisplayNumberAuto,
+  readingDisplayNumber,
+  readingColor,
+  readingAutoPageTurn
+);
+
 
 let txtLen = Math.round(readingDisplayNumberAuto
   ? (process.stdout.columns - 6) * 1.5
@@ -35,8 +48,6 @@ function read(path, start, cb, sOffset = 0, eOffset = 0) {
   });
   let txt = '';
 
-  // txt += encodeUnicode(data.replace(/[\n|\r]/g, '')).replace(/\\ufffd/g, '');
-
   return new Promise((resolve => {
     rs.on('data', (data) => {
       txt += data;
@@ -57,8 +68,14 @@ function read(path, start, cb, sOffset = 0, eOffset = 0) {
         readline.clearLine(process.stdout, 0);
         readline.cursorTo(process.stdout, 0, fd);
 
+        const renderTxt = txt
+          .replace(/[\n|\r]/g, '')
+          .replace(/\s+/g, ' ');
+
         process.stdout.write(
-          txt.replace(/[\n|\r]/g, '').replace(/\s+/g, ' '),
+          readingColor
+            ? chalk.hex(readingColor)(renderTxt)
+            : renderTxt,
           'utf-8'
         );
         cb(start + sOffset + txtLen + eOffset, start + sOffset);
@@ -76,6 +93,7 @@ module.exports = () => {
   const _conf = conf.book[conf.current];
   let start = _conf.current;
   let oldStart = start;
+  let timeId;
   fd = process.stdin.fd;
 
   console.clear();
@@ -84,6 +102,19 @@ module.exports = () => {
     isEnd(s, _conf.total);
     start = s;
     oldStart = o;
+
+    if (readingAutoPageTurn) {
+      timeId = setInterval(() => {
+        read(
+          _conf.path,
+          start,
+          (s2, o2) => {
+            isEnd(s2, _conf.total);
+            start = s2;
+            oldStart = o2;
+          });
+      }, readingAutoPageTurn * 1000)
+    }
   });
 
   keypress(process.stdin);
@@ -100,7 +131,13 @@ module.exports = () => {
         });
     }
 
+    if (key && key.name == 's') {
+      clearInterval(timeId);
+      timeId = undefined;
+    }
+
     if (key && key.ctrl && key.name == 'c') {
+      if (timeId) clearInterval(timeId);
       save(oldStart);
       process.stdin.pause();
     }
