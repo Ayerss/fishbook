@@ -91,16 +91,17 @@ function parsed(formPath, toPath) {
 
 function exportConf (toPath) {
   const conf = require(global.fishBook.bookshelfPath);
-  const load = loading();
   const filename = path.basename(toPath).replace('.txt', '');
   const chapterPath = path.resolve(global.fishBook.chapterPath, filename + '.json');
-
+  // const load = loading();
+  console.time('\u23F1');
   identifyChapter(toPath)
     .then(chapter => {
       saveConf(chapterPath, chapter);
       return chapter.length;
     })
     .then(chapterLength => {
+      console.timeEnd('\u23F1');
       const stats = fs.statSync(toPath);
       conf.current = filename;
       conf.book[filename] = {
@@ -112,7 +113,7 @@ function exportConf (toPath) {
         total: stats.size
       };
       saveConf(global.fishBook.bookshelfPath, conf);
-      load.close();
+      // load.close();
       log(chalk.green(`\u2728 识别到${chapterLength}个章节`));
     });
 }
