@@ -25,6 +25,18 @@ function type2Conf (type, message, suffix) {
         suffix: chalk.gray(`(${suffix ? 'Y' : 'n'})`),
         name: 'val',
       }
+    case 'color':
+      return {
+        type: 'input',
+        message,
+        suffix: chalk.gray(`(${suffix})`),
+        name: 'val',
+        validate: function(val) {
+          return val === '' || /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(val)
+            ? true
+            : "请输入16进制颜色值 (按上键重新输入)";
+        }
+      }
   }
 }
 
@@ -55,6 +67,7 @@ module.exports = function () {
             ? 0
             : Math.round((process.stdout.columns - 6) * 1.5);
         }
+
         saveConf(global.fishBook.confPath, confJson);
       }
 

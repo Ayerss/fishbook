@@ -14,8 +14,8 @@ function format(version) {
 }
 
 module.exports = async() => {
-  const confJson = require(path.resolve(global.fishBook.confPath));
-  const saveConf = require(path.resolve(global.fishBook.srcPath, 'utils', 'saveConf.js'));
+  const confJson = require(global.fishBook.confPath);
+  const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
 
   const { checkVersion } = confJson;
 
@@ -36,20 +36,20 @@ module.exports = async() => {
     if (format(checkVersion.latest) > format(version)) {
       console.log(`
 
-          >=>                            >=>
-          >=>                            >=>
-          >=>         >=>        >=>     >=>  >=>
-          >=>>==>   >=>  >=>   >=>  >=>  >=> >=>
-          >=>  >=> >=>    >=> >=>    >=> >=>=>
-          >=>  >=>  >=>  >=>   >=>  >=>  >=> >=>
-          >=>>==>     >=>        >=>     >=>  >=>
+            >=>                            >=>
+            >=>                            >=>
+            >=>         >=>        >=>     >=>  >=>
+            >=>>==>   >=>  >=>   >=>  >=>  >=> >=>
+            >=>  >=> >=>    >=> >=>    >=> >=>=>
+            >=>  >=>  >=>  >=>   >=>  >=>  >=> >=>
+            >=>>==>     >=>        >=>     >=>  >=>
 
-${chalk.yellow('.-----------------------------------------------------------.')}
-${chalk.yellow('|                                                           |')}
-${chalk.yellow('|')}  New ${chalk.cyan('patch')} version of fishbook available! ${chalk.red(version)} -> ${chalk.green(checkVersion.latest)}  ${chalk.yellow('|')}
-${chalk.yellow('|')}          Run ${chalk.green('npm install -g fishbook')} to update!           ${chalk.yellow('|')}
-${chalk.yellow('|                                                           |')}
-${chalk.yellow('\'-----------------------------------------------------------\'')}
+  ${chalk.yellow('.-----------------------------------------------------------.')}
+  ${chalk.yellow('|                                                           |')}
+  ${chalk.yellow('|')}  New ${chalk.cyan('patch')} version of fishbook available! ${chalk.red(version)} -> ${chalk.green(checkVersion.latest)}  ${chalk.yellow('|')}
+  ${chalk.yellow('|')}          Run ${chalk.green('npm install -g fishbook')} to update!           ${chalk.yellow('|')}
+  ${chalk.yellow('|                                                           |')}
+  ${chalk.yellow('\'-----------------------------------------------------------\'')}
 `);
 
       return false;
