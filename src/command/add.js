@@ -3,10 +3,10 @@ const path = require('path');
 const chalk = require('chalk');
 const chardet = require('chardet');
 const iconv = require('iconv-lite');
-const loading = require(global.fishBook.srcPath + '/utils/loading.js');
-const identifyChapter = require(global.fishBook.srcPath + '/utils/identifyChapter.js');
-const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
-const _fs = require(global.fishBook.srcPath + '/utils/fs-promise.js');
+const loading = require('../utils/loading');
+const identifyChapter = require('../utils/identifyChapter');
+const saveConf = require('../utils/saveConf');
+const _fs = require('../utils/fs-promise');
 
 const log = console.log;
 
@@ -14,7 +14,7 @@ module.exports = function (formPath) {
   const isRelativePath = formPath.indexOf('/') === 0 ? false : true;
 
   if (isRelativePath) {
-    formPath = path.resolve(process.cwd(), formPath);
+    formPath = path.join(process.cwd(), formPath);
   }
 
   if (fs.existsSync(formPath) === false) {
@@ -28,7 +28,7 @@ module.exports = function (formPath) {
     return
   }
 
-  const toPath = path.resolve(
+  const toPath = path.join(
     global.fishBook.bookPath,
     path.basename(formPath)
   );
@@ -56,7 +56,7 @@ async function copyFile(formPath, toPath) {
   let data = await _fs.readFile(formPath);
   if(encoding === "Big5" || encoding === "GB18030" ){
     data = iconv.decode(data, 'gbk');
-  } else if(encoding === 'uft-8') {
+  } else if(encoding === 'UTF-8') {
 
   } else {
     return new Error(`不支持${encoding}编码`);
@@ -77,14 +77,14 @@ function parsed(formPath, toPath) {
     })
     .catch(err => {
       load.close();
-      log(chalk.red('Error:' + err));
+      log(chalk.red(err.message));
     });
 }
 
 function exportConf (toPath, size) {
   const conf = require(global.fishBook.bookshelfPath);
   const filename = path.basename(toPath).replace('.txt', '');
-  const chapterPath = global.fishBook.chapterPath + '/' + filename + '.json';
+  const chapterPath = path.join(global.fishBook.chapterPath, filename + '.json');
   // const load = loading();
   console.time('\u23F1');
   identifyChapter(toPath)
@@ -105,7 +105,10 @@ function exportConf (toPath, size) {
       };
       saveConf(global.fishBook.bookshelfPath, conf);
       // load.close();
-      log(chalk.green(`\u2728 识别到${chapterLength}个章节`));
+      log(chalk.green(`\u{1F389} 识别到${chapterLength}个章节`));
+    })
+    .catch(err => {
+      log(chalk.red(err.message));
     });
 }
 

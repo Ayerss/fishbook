@@ -43,8 +43,25 @@ fishbook read
 ## 删除小说
 ```
 fishbook bookshelf -d            // 选择要删除的小说
-fishbook bookshelf 小说名 -d   // 删除指定小说
+fishbook bookshelf 小说名 -d      // 删除指定小说
 ```
+
+
+## 网盘资源
+```
+fishbook pan                  // 打开默认浏览器, 点击小说名可下载小说
+fishbook pan -s 小说名         // 搜索网盘资源中的小说，模糊搜索小说名
+```
+
+## 上传小说
+
+```
+fishbook bookshelf -u            // 选择要上传的小说
+fishbook bookshelf 小说名 -u      // 上传指定小说
+```
+
+- 网盘中已有相同hash值将上传失败
+- 最大支持100MB
 
 ## 设置
 

@@ -48,5 +48,6 @@ module.exports = async function (path) {
   const data = await readFile(path);
   const newReg = createNewReg(data);
   const chapters = data.match(newReg);
+
   return getIndex(data, chapters);
 }

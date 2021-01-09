@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const conf = require(global.fishBook.bookshelfPath);
-const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
+const saveConf = require('../utils/saveConf');
 
 let chapter;
 

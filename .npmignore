@@ -4,7 +4,7 @@ node_modules
 .idea
 .vscode
 
-docs
+.editorconfig
 
 *-lock.json
 *.lock
