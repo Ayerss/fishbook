@@ -44,8 +44,8 @@ function deleteBook(book) {
 function uploadBook(book) {
   const axios = require('axios');
   const FormData = require('form-data');
-  const load = new loading();
-  const maxLen = 1024 * 1024 * 100
+  const load = new loading('上传中');
+  const maxLen = 1024 * 1024 * 100;
 
   const form = new FormData();
   form.append('file', fs.createReadStream(conf.book[book].path));
@@ -56,7 +56,6 @@ function uploadBook(book) {
     maxContentLength: maxLen
   }).then(res=> {
     load.close();
-    console.log(res.data);
     if (res.data.code === 0) {
       log(chalk.green('\u{1F389} 上传成功'));
     } else {

@@ -3,9 +3,8 @@ const path = require('path');
 const chalk = require('chalk');
 const axios = require('axios');
 const inquirer = require('inquirer');
-const loading = require('../utils/loading');
+const readline = require('readline');
 const saveConf = require('../utils/saveConf');
-const identifyChapter = require('../utils/identifyChapter');
 const log = console.log;
 
 module.exports = async function (search) {
@@ -27,15 +26,16 @@ module.exports = async function (search) {
   ).then(res => res.data);
 
   if (searchData.code == 0) {
+    if (searchData.data.length === 0) {
+      log(chalk.red('\u{1F50E} 未查询到'));
+      return;
+    }
     const book = await selected(searchData.data);
     if (book) {
-      const load = loading();
+      downloadChapter(book);
       await download(book);
-      load.close();
-
       await saveBookInfo(book);
     }
-
   } else {
     log(chalk.red(searchData.message));
   }
@@ -68,17 +68,42 @@ async function selected(data) {
   }
 }
 
+function downloadChapter(info) {
+  const formJsonPath = global.fishBook.api + info.chapter;
+  const toJson = path.join(global.fishBook.chapterPath, info.name + '.json');
+
+  const writerJson = fs.createWriteStream(toJson);
+
+  axios({
+    url: formJsonPath,
+    method: 'GET',
+    responseType: 'stream'
+  }).then(res => {
+    res.data.pipe(writerJson);
+  });
+  writerJson.on("error", error => {
+    fs.unlink(toJson, () => {});
+  });
+}
+
 function download(info) {
-  const formPath = path.join(global.fishBook.api, info.path);
+  const formPath = global.fishBook.api + info.path;
+
   const toPath = path.join(global.fishBook.bookPath, info.name + '.txt');
 
   const writer = fs.createWriteStream(toPath);
+
+  let isFinish = false;
+
+  readline.clearLine(process.stdout, 0);
+  readline.cursorTo(process.stdout, 0);
+  process.stdout.write('\u23F3 下载中...', 'utf-8');
 
   return new Promise((resolve, reject) => {
     axios({
       url: formPath,
       method: 'GET',
-      responseType: 'stream',
+      responseType: 'stream'
     }).then(res => {
       res.data.pipe(writer);
     }).catch(err => {
@@ -86,10 +111,28 @@ function download(info) {
     });
 
     writer.on('finish', () => {
-      resolve(true);
+      isFinish = true;
     });
     writer.on("error", error => {
+      fs.unlink(toPath, () => {});
       reject(error);
+    });
+
+    fs.watchFile(toPath,(curr) => {
+      const percentage = Math.round(curr.size / info.size * 100);
+      readline.clearLine(process.stdout, 0);
+      readline.cursorTo(process.stdout, 0);
+
+      process.stdout.write(
+        percentage === 100
+          ? chalk.green('\u{1F381} 下载完成')
+          : '\u23F3 下载进度: ' + percentage + '%', 'utf-8');
+
+      if (isFinish) {
+        fs.unwatchFile(toPath);
+        log('\r');
+        resolve(true);
+      }
     });
   });
 }
@@ -103,21 +146,18 @@ async function saveBookInfo(book) {
     log('\u{1F928} 正在替换本地');
   }
 
-  const chapters = await identifyChapter(bookPath);
-
   conf.current = book.name;
   conf.book[book.name] = {
     name: book.name,
     path: bookPath,
     chapterPath,
-    chapterLength: chapters.length,
+    chapterLength: book.chapterLen,
     current: 0,
     total: book.size
   };
 
-  saveConf(chapterPath, chapters);
   saveConf(global.fishBook.bookshelfPath, conf);
-  log(chalk.green(`\u{1F389} 识别到${chapters.length}个章节`));
+  log(chalk.green(`\u{1F389} 识别到${book.chapterLen}个章节`));
 }
 
 function openDefaultBrowser(url) {
