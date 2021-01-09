@@ -11,8 +11,8 @@ checkVersion().then(status => {
     program
       .command('add <path>')
       .description('添加书籍')
-      .action(function (options) {
-        require(global.fishBook.srcPath + '/command/add.js')(options);
+      .action(function (path) {
+        require(global.fishBook.srcPath + '/command/add.js')(path);
       });
 
     program
@@ -25,10 +25,15 @@ checkVersion().then(status => {
 
     program
       .command('bookshelf [book]')
-      .option('-d, --delete [bool]', '删除书籍')
+      .option('-u, --upload', '上传书籍')
+      .option('-d, --delete', '删除书籍')
       .description('切换书籍')
       .action(function (name, option) {
-        require(global.fishBook.srcPath + '/command/bookshelf.js')(name, !!option.delete);
+        require(global.fishBook.srcPath + '/command/bookshelf.js')(
+          name,
+          option.delete,
+          option.upload
+        );
       });
 
     program
@@ -36,6 +41,14 @@ checkVersion().then(status => {
       .description('阅读')
       .action(function (options) {
         require(global.fishBook.srcPath + '/command/read.js')(options);
+      });
+
+    program
+      .command('pan')
+      .option('-s, --search [book]', '搜索书籍')
+      .description('共享网盘')
+      .action(function (option) {
+        require(global.fishBook.srcPath + '/command/pan.js')(option.search);
       });
 
     program

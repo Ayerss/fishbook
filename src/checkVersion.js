@@ -1,7 +1,6 @@
 const axios = require('axios');
-const path = require('path');
 const chalk = require('chalk');
-const {version} = require(path.resolve(__dirname, '..', 'package.json'));
+const {version} = require('../package.json');
 
 function getVersion() {
   return axios.get('http://registry.npmjs.org/fishbook').then(res => {

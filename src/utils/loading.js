@@ -6,11 +6,11 @@
 const readline = require('readline');
 const P = ['\\', '|', '/', '-'];
 
-function loading () {
+function loading (txt) {
   let x = 0;
 
   return setInterval(function () {
-    const str = P[x++] + ' 加载中' + ''.padStart(x, '.');
+    const str = `${P[x++]} ${txt} ${''.padStart(x, '.')}`;
 
     readline.clearLine(process.stdout, 0);
     readline.cursorTo(process.stdout, 0);
@@ -20,12 +20,12 @@ function loading () {
   }, 250);
 }
 
-module.exports = function () {
- let timeId = loading();
+module.exports = function (txt = '加载中') {
+ let timeId = loading(txt);
 
   return {
     start() {
-      timeId = loading();
+      timeId = loading(txt);
     },
     close() {
       // console.log('\r');

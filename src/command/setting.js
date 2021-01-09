@@ -1,8 +1,8 @@
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const confJson = require(global.fishBook.confPath);
+const saveConf = require('../utils/saveConf');
 const { settings } = confJson;
-const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
 
 function type2Conf (type, message, suffix) {
   switch (type) {
@@ -71,7 +71,7 @@ module.exports = function () {
         saveConf(global.fishBook.confPath, confJson);
       }
 
-      console.log(chalk.green(`\u2728 设置成功！`));
+      console.log(chalk.green(`\u{1F389} 设置成功！`));
     })
   });
 }

@@ -3,7 +3,7 @@ const keypress = require('keypress');
 const readline = require('readline');
 const chalk = require('chalk');
 const conf = require(global.fishBook.bookshelfPath);
-const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
+const saveConf = require('../utils/saveConf');
 
 const {
   readingDisplayNumberAuto,
@@ -17,14 +17,6 @@ const {
     return o;
   }, {});
 })();
-
-console.log(
-  readingDisplayNumberAuto,
-  readingDisplayNumber,
-  readingColor,
-  readingAutoPageTurn
-);
-
 
 let txtLen = Math.round(readingDisplayNumberAuto
   ? (process.stdout.columns - 6) * 1.5

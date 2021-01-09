@@ -116,6 +116,7 @@ module.exports = function () {
     bookshelfPath,
     bookPath,
     chapterPath,
-    srcPath
+    srcPath,
+    api: 'http://fish.ayers.top'
   };
 }
