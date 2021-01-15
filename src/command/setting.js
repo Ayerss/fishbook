@@ -1,8 +1,50 @@
 const inquirer = require('inquirer');
 const chalk = require('chalk');
-const confJson = require(global.fishBook.confPath);
+const bookshelfConf = require(global.fishbook.confPath);
 const saveConf = require('../utils/saveConf');
-const { settings } = confJson;
+
+const { settings } = bookshelfConf;
+
+module.exports = async () => {
+  const choices = Object
+    .keys(settings)
+    .map(key => {
+      return {
+        name: settings[key].description,
+        value: settings[key]
+      }
+    });
+
+  const { item } = await inquirer.prompt({
+    type: 'list',
+    message: '请选择配置项:',
+    name: 'item',
+    choices
+  });
+
+  const { val } = await inquirer.prompt(type2Conf(
+    item.type,
+    item.message,
+    item.value
+  ));
+
+  if (val !== item.value) {
+    settings[item.name].value = val;
+    if (item.name === 'readingDisplayNumber' && val > 0) {
+      settings.readingDisplayNumberAuto.value = false;
+    }
+    if (item.name === 'readingDisplayNumberAuto') {
+      settings.readingDisplayNumber.value = val
+        ? 0
+        : Math.round((process.stdout.columns - 6) * 1.5);
+    }
+
+    await saveConf(global.fishbook.confPath, bookshelfConf);
+  }
+
+  console.log(chalk.green(`\u{1F389} 设置成功！`));
+  return
+}
 
 function type2Conf (type, message, suffix) {
   switch (type) {
@@ -38,40 +80,4 @@ function type2Conf (type, message, suffix) {
         }
       }
   }
-}
-
-module.exports = function () {
-  const choices = Object
-    .keys(settings)
-    .map(key => {
-      return {
-        name: settings[key].description,
-        value: settings[key]
-      }
-    });
-
-  inquirer.prompt({
-    type: 'list',
-    message: '请选择配置项:',
-    name: 'item',
-    choices
-  }).then(({ item }) => {
-    inquirer.prompt(type2Conf(item.type, item.message, item.value)).then(({ val }) => {
-      if (val !== item.value) {
-        settings[item.name].value = val;
-        if (item.name === 'readingDisplayNumber' && val > 0) {
-          settings.readingDisplayNumberAuto.value = false;
-        }
-        if (item.name === 'readingDisplayNumberAuto') {
-          settings.readingDisplayNumber.value = val
-            ? 0
-            : Math.round((process.stdout.columns - 6) * 1.5);
-        }
-
-        saveConf(global.fishBook.confPath, confJson);
-      }
-
-      console.log(chalk.green(`\u{1F389} 设置成功！`));
-    })
-  });
 }
