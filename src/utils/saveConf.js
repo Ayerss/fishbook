@@ -1,8 +1,5 @@
-const fs = require('fs');
+const fs = require('fs/promises');
 
-module.exports = function (path, conf) {
-  fs.writeFileSync(
-    path,
-    JSON.stringify(conf, null, 2)
-  );
+module.exports = (path, data) => {
+  return fs.writeFile(path, JSON.stringify(data, null, 2));
 }

@@ -1,6 +1,6 @@
 const axios = require('axios');
 const chalk = require('chalk');
-const {version} = require('../package.json');
+const {version} = require('../../package.json');
 
 function getVersion() {
   return axios.get('http://registry.npmjs.org/fishbook').then(res => {
@@ -12,9 +12,9 @@ function format(version) {
   return Number(version.replace(/\./g, ''));
 }
 
-module.exports = async() => {
-  const confJson = require(global.fishBook.confPath);
-  const saveConf = require(global.fishBook.srcPath + '/utils/saveConf.js');
+module.exports = async () => {
+  const confJson = require(global.fishbook.confPath);
+  const saveConf = require(global.fishbook.srcPath + '/utils/saveConf.js');
 
   const { checkVersion } = confJson;
 
@@ -23,39 +23,36 @@ module.exports = async() => {
   }
 
   const now = Date.now();
+  let latest = checkVersion.latest;
 
   if ( now > checkVersion.lastTimestamp + 864e5 ) {
-    const latest = await getVersion();
+    latest = await getVersion();
     confJson.checkVersion = {
       lastTimestamp: now,     // 最后一次检查的时间戳
-      latest                 // 最后一个的版本
+      latest                  // 最后一个的版本
     };
-    saveConf(global.fishBook.confPath, confJson);
-  } else {
-    if (format(checkVersion.latest) > format(version)) {
-      console.log(`
+    await saveConf(global.fishbook.confPath, confJson);
+  }
 
-            >=>                            >=>
-            >=>                            >=>
-            >=>         >=>        >=>     >=>  >=>
-            >=>>==>   >=>  >=>   >=>  >=>  >=> >=>
-            >=>  >=> >=>    >=> >=>    >=> >=>=>
-            >=>  >=>  >=>  >=>   >=>  >=>  >=> >=>
-            >=>>==>     >=>        >=>     >=>  >=>
-
+  if (format(latest) > format(version)) {
+    console.log(`
+          >=>                            >=>
+          >=>                            >=>
+          >=>         >=>        >=>     >=>  >=>
+          >=>>==>   >=>  >=>   >=>  >=>  >=> >=>
+          >=>  >=> >=>    >=> >=>    >=> >=>=>
+          >=>  >=>  >=>  >=>   >=>  >=>  >=> >=>
+          >=>>==>     >=>        >=>     >=>  >=>
   ${chalk.yellow('.-----------------------------------------------------------.')}
   ${chalk.yellow('|                                                           |')}
-  ${chalk.yellow('|')}  New ${chalk.cyan('patch')} version of fishbook available! ${chalk.red(version)} -> ${chalk.green(checkVersion.latest)}  ${chalk.yellow('|')}
+  ${chalk.yellow('|')}  New ${chalk.cyan('patch')} version of fishbook available! ${chalk.red(version)} -> ${chalk.green(latest)}  ${chalk.yellow('|')}
   ${chalk.yellow('|')}          Run ${chalk.green('npm install -g fishbook')} to update!           ${chalk.yellow('|')}
   ${chalk.yellow('|                                                           |')}
   ${chalk.yellow('\'-----------------------------------------------------------\'')}
 `);
 
-      return false;
-    }
+    return false;
   }
 
   return true;
 }
-
-

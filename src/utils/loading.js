@@ -21,7 +21,7 @@ function loading (txt) {
 }
 
 module.exports = function (txt = '加载中') {
- let timeId = loading(txt);
+  let timeId = loading(txt);
 
   return {
     start() {
@@ -36,4 +36,3 @@ module.exports = function (txt = '加载中') {
     }
   }
 }
-
