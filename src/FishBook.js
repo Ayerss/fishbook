@@ -1,25 +1,7 @@
 const {join} = require('path');
-const {homedir} = require('os');
 const chalk = require('chalk');
-const fileDetection = require('./utils/fileDetection');
-
-const fishBookPath = homedir() + '/.fishBook';
-
-global.fishbook = {
-  fishBookPath,
-  srcPath: __dirname,
-  confPath: join(fishBookPath, 'fishBook.json'),
-  bookshelfPath: join(fishBookPath, 'bookshelf.json'),
-  bookPath: join(fishBookPath, 'book'),
-  chapterPath: join(fishBookPath, '.chapter'),
-  api: 'http://fish.ayers.top'
-}
 
 class FishBook {
-  constructor() {
-    fileDetection();
-  }
-
   bookshelf = async ({delete: isDelete, upload: isUpload}) => {
     if(isDelete) {
       await this.operatBook('delete');

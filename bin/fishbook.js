@@ -1,9 +1,28 @@
 #!/usr/bin/env node
 
+const {join} = require('path');
+const {homedir} = require('os');
 const {program} = require('commander');
 const {version} = require('../package.json');
+
 const fishBook = require('../src/FishBook');
+const fileDetection = require('../src/utils/fileDetection');
 const checkVersion = require('../src/utils/checkVersion');
+
+const fishBookPath = homedir() + '/.fishBook';
+
+global.fishbook = {
+  fishBookPath,
+  srcPath: join(__dirname, '..', 'src'),
+  confPath: join(fishBookPath, 'fishBook.json'),
+  bookshelfPath: join(fishBookPath, 'bookshelf.json'),
+  bookPath: join(fishBookPath, 'book'),
+  chapterPath: join(fishBookPath, '.chapter'),
+  api: 'http://fish.ayers.top',
+  onlineHost: 'http://read.ayers.top'
+}
+
+fileDetection();
 
 checkVersion().then(status => {
   if (status) {

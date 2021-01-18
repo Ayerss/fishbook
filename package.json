@@ -1,6 +1,6 @@
 {
   "name": "fishbook",
-  "version": "0.1.9",
+  "version": "0.2.1",
   "description": "Command line reading fiction.",
   "license": "MIT",
   "bin": {
