@@ -1,6 +1,6 @@
 const chalk = require('chalk');
 const inquirer = require('inquirer');
-const { unlink } = require('fs/promises');
+const { unlink } = require('fs').promises;
 const { createReadStream } = require('fs');
 const bookshelf = require('../container/bookshelf');
 const saveConf = require('../utils/saveConf');

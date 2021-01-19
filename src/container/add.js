@@ -1,4 +1,4 @@
-const { writeFile, readFile } = require('fs/promises');
+const { writeFile, readFile } = require('fs').promises;
 const { join, basename } = require('path');
 const { detectFile } = require('chardet');
 const { existsSync } = require('fs');

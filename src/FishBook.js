@@ -1,96 +1,75 @@
 const {join} = require('path');
-const {homedir} = require('os');
 const chalk = require('chalk');
-const fileDetection = require('./utils/fileDetection');
 
-const fishBookPath = homedir() + '/.fishBook';
-
-global.fishbook = {
-  fishBookPath,
-  srcPath: __dirname,
-  confPath: join(fishBookPath, 'fishBook.json'),
-  bookshelfPath: join(fishBookPath, 'bookshelf.json'),
-  bookPath: join(fishBookPath, 'book'),
-  chapterPath: join(fishBookPath, '.chapter'),
-  api: 'http://fish.ayers.top'
+async function bookshelf({delete: isDelete, upload: isUpload}) {
+  if(isDelete) {
+    await operatBook('delete');
+  }
+  else if(isUpload) {
+    await operatBook('upload');
+  }
+  else {
+    await selectedBook();
+  }
+  return
 }
 
-class FishBook {
-  constructor() {
-    fileDetection();
+async function add(path){
+  const add = require(getPath('add'));
+  await add(path);
+  read();
+}
+
+async function chapter(page = 1, option){
+  if (getCurrent) {
+    const selectedChapter = require(getPath('chapter'));
+    await selectedChapter(page, option.search);
+    read();
+  }
+}
+
+function read(){
+  if (getCurrent) {
+    require(getPath('read'))();
+  }
+}
+
+async function setting(){
+  const setting = require(getPath('setting'));
+  await setting();
+}
+
+async function pan({search}) {
+  if (search === true) {
+    console.log(chalk.red('请输入需要搜索的书名'));
+    return;
+  } else if (
+    search !== undefined &&
+    /^[A-Za-z0-9\u4e00-\u9fa5]+$/g.test(search) === false) {
+    console.log(chalk.red('书名格式错误'));
+    return;
   }
 
-  bookshelf = async ({delete: isDelete, upload: isUpload}) => {
-    if(isDelete) {
-      await this.operatBook('delete');
-    }
-    else if(isUpload) {
-      await this.operatBook('upload');
-    }
-    else {
-      await this.selectedBook();
-    }
-    return
+  const pan = require(getPath(search ? 'panSearch' : 'pan'));
+  const isRead = await pan(search);
+  if (isRead) {
+    console.log('即将进入阅读模式...');
+    setTimeout(() => {
+      isRead && read();
+    }, 1500);
   }
+}
 
-  add = async path => {
-    const add = require(getPath('add'));
-    await add(path);
-    this.read();
-  }
+async function selectedBook() {
+  const selectedBook = require(getPath('bookshelf'));
+  await selectedBook();
+  read();
+}
 
-  chapter = async (page = 1, option) => {
-    if (getCurrent) {
-      const selectedChapter = require(getPath('chapter'));
-      await selectedChapter(page, option.search);
-      this.read();
-    }
-  }
-
-  read = () => {
-    if (getCurrent) {
-      require(getPath('read'))();
-    }
-  }
-
-  setting = async () => {
-    const setting = require(getPath('setting'));
-    await setting();
-  }
-
-  pan = async ({search}) => {
-    if (search === true) {
-      console.log(chalk.red('请输入需要搜索的书名'));
-      return;
-    } else if (
-      search !== undefined &&
-      /^[A-Za-z0-9\u4e00-\u9fa5]+$/g.test(search) === false) {
-      console.log(chalk.red('书名格式错误'));
-      return;
-    }
-
-    const pan = require(getPath(search ? 'panSearch' : 'pan'));
-    const isRead = await pan(search);
-    if (isRead) {
-      console.log('即将进入阅读模式...');
-      setTimeout(() => {
-        isRead && this.read();
-      }, 1500);
-    }
-  }
-
-  selectedBook = async () => {
-    const selectedBook = require(getPath('bookshelf'));
-    await selectedBook();
-    this.read();
-  }
-
-  operatBook = async type => {
-    const operating = require(getPath('operatBook'));
-    await operating(type);
-    return
-  }
-
+async function operatBook({type}) {
+  const operating = require(getPath('operatBook'));
+  await operating(type);
+  return
 }
 
 function getPath(name) {
@@ -107,4 +86,11 @@ function getCurrent() {
   }
 }
 
-module.exports = new FishBook();
+module.exports = {
+  bookshelf,
+  add,
+  chapter,
+  read,
+  pan,
+  setting
+};

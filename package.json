@@ -1,6 +1,6 @@
 {
   "name": "fishbook",
-  "version": "0.1.9",
+  "version": "0.2.1",
   "description": "Command line reading fiction.",
   "license": "MIT",
   "bin": {
@@ -36,6 +36,6 @@
     "touch fish"
   ],
   "engines": {
-    "node": ">= 10.0.0"
+    "node": ">= 10.23.1"
   }
 }
