@@ -11,10 +11,8 @@ const bookshelfConf = require(global.fishbook.bookshelfPath);const {
 } = require('../utils/getSetting');
 
 class Read {
-  timeId = undefined;
-
-
   constructor(book) {
+    this.timeId = undefined;
     this.fd = process.stdin.fd;
     this.path = book.path; // 小说路径
     this.total = book.total; // 总字节
@@ -29,7 +27,7 @@ class Read {
     this.execute();
   }
 
-  reading = (cb, sOffset = 0, eOffset = 0) => {
+  reading (cb, sOffset = 0, eOffset = 0) {
 
 
     const start = this.start < 0 ? 0 : this.start;
@@ -82,7 +80,7 @@ class Read {
     })
   }
 
-  execute = () => {
+  execute() {
     console.clear();
 
     keypress(process.stdin);
@@ -92,13 +90,12 @@ class Read {
 
       if (readingAutoPageTurn) {
         this.timeId = setInterval(() => {
-          this.reading(this.isEnd);
+          this.reading(() => this.isEnd());
         }, readingAutoPageTurn * 1000);
       }
 
       process.stdin.resume();
     });
-
 
     process.stdin.on('keypress', (ch, key) => {
 
@@ -106,7 +103,7 @@ class Read {
         this.start = key.name === 'down'
           ? this.start
           : this.oldStart - this.renderWordTotal;
-        this.reading(this.isEnd);
+        this.reading(() => this.isEnd());
       }
 
       if (key && key.name == 's') {
@@ -125,7 +122,7 @@ class Read {
   }
 
   // 文字转Unicode
-  encodeUnicode = str => {
+  encodeUnicode(str) {
     const res = [];
     for (let i = 0, len = str.length; i < len; i++) {
       res[i] = ( "00" + str.charCodeAt(i).toString(16) ).slice(-4);
@@ -133,7 +130,7 @@ class Read {
     return "$" + res.join("$"); // $ = \u
   }
 
-  isEnd = () => {
+  isEnd() {
     if (this.start >= this.total) {
       console.log('\r');
       console.log(chalk.cyan('已读完'));
@@ -142,7 +139,7 @@ class Read {
     }
   }
 
-  save = start => {
+  save(start) {
     bookshelfConf.book[bookshelfConf.current]['current'] = start;
     saveConf(global.fishbook.bookshelfPath, bookshelfConf);
     console.log('\r');

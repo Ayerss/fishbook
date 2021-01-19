@@ -55,7 +55,7 @@ function type2Conf (type, message, suffix) {
         name: 'val',
         suffix: chalk.gray(`(${suffix})`),
         validate: function(val) {
-          return /^\d$/.test(val)
+          return /^([0]|[1-9][0-9]*)$/.test(val)
             ? true
             : "请输入数字 (按上键重新输入)";
         }
