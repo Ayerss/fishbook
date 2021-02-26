@@ -9,9 +9,13 @@ const bookshelfConf = require(global.fishbook.bookshelfPath);const {
   readingColor,
   readingAutoPageTurn
 } = require('../utils/getSetting');
+const spawn = require('child_process').spawn;
+
+const isMac = require('os').type() === 'Darwin';
 
 class Read {
   constructor(book) {
+    this.isPlay = false;
     this.timeId = undefined;
     this.fd = process.stdin.fd;
     this.path = book.path; // 小说路径
@@ -73,6 +77,13 @@ class Read {
             : formatTxt,
           'utf-8'
         );
+
+        if (this.isPlay) {
+          this.play(formatTxt).then(() => {
+            this.reading(() => this.isEnd());
+          })
+        }
+
         this.oldStart = start + sOffset;
         this.start = this.oldStart + this.renderWordTotal + eOffset;
         cb();
@@ -106,6 +117,18 @@ class Read {
         this.reading(() => this.isEnd());
       }
 
+      if (key && key.name == 'p' && isMac) {
+        if (this.isPlay) {
+          this.start = this.oldStart;
+          this.isPlay = false;
+          this.playId.kill('SIGHUP');
+        } else {
+          this.isPlay = true;
+          this.start = this.oldStart;
+          this.reading(() => this.isEnd());
+        }
+      }
+
       if (key && key.name == 's') {
         clearInterval(this.timeId);
         this.timeId = undefined;
@@ -113,6 +136,11 @@ class Read {
 
       if (key && key.ctrl && key.name == 'c') {
         if (this.timeId) clearInterval(this.timeId);
+        if (this.isPlay) {
+          this.isPlay = false;
+          this.start = this.oldStart;
+          this.playId.kill('SIGHUP');
+        };
         this.save(this.oldStart);
         process.stdin.pause();
       }
@@ -144,6 +172,25 @@ class Read {
     saveConf(global.fishbook.bookshelfPath, bookshelfConf);
     console.log('\r');
     console.log(chalk.green('\u{1F516} 已保存阅读记录'));
+  }
+
+  play(txt) {
+    return new Promise((resolve, reject) => {
+      this.playId = spawn(`say`, [
+        '-r',
+        '10',
+        '-v',
+        'Ting-Ting',
+        txt
+      ]);
+
+      this.playId.on('close', () => {
+        resolve();
+      });
+      this.playId.on('error', (err) => {
+        reject(err);
+      })
+    })
   }
 }
 
