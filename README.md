@@ -48,7 +48,7 @@ fishbook read
 
 - 默认最后一次添加/下载/阅读的小说
 - 上下键翻页
-- 按p键听书，再次按下停止(beta 现仅支持MacOs, Window)
+- 按p键听书，再次按下停止，支持MacOs, Window 10
 
 ## 网盘资源
 ```

@@ -188,7 +188,9 @@ class Read {
           '/s',
           '/c',
           `mshta vbscript:createobject("sapi.spvoice").speak("${txt}")(window.close)`
-        ]);
+        ], {
+          windowsVerbatimArguments: true
+        });
 
       this.playId.on('close', () => {
         resolve();
