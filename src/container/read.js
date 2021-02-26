@@ -11,7 +11,7 @@ const bookshelfConf = require(global.fishbook.bookshelfPath);const {
 } = require('../utils/getSetting');
 const spawn = require('child_process').spawn;
 
-const isMac = require('os').type() === 'Darwin';
+const osType = require('os').type();
 
 class Read {
   constructor(book) {
@@ -117,7 +117,7 @@ class Read {
         this.reading(() => this.isEnd());
       }
 
-      if (key && key.name == 'p' && isMac) {
+      if (key && key.name == 'p' && ['Darwin', 'Windows_NT'].includes(osType)) {
         if (this.isPlay) {
           this.start = this.oldStart;
           this.isPlay = false;
@@ -176,13 +176,19 @@ class Read {
 
   play(txt) {
     return new Promise((resolve, reject) => {
-      this.playId = spawn(`say`, [
-        '-r',
-        '10',
-        '-v',
-        'Ting-Ting',
-        txt
-      ]);
+      this.playId = osType === 'Darwin'
+        ? spawn('say', [
+          '-r',
+          '10',
+          '-v',
+          'Mei-Jia', // Ting-Ting
+          txt
+        ])
+        : spawn('cmd.exe', [
+          '/s',
+          '/c',
+          `mshta vbscript:createobject("sapi.spvoice").speak("${txt}")(window.close)`
+        ]);
 
       this.playId.on('close', () => {
         resolve();
