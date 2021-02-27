@@ -1,7 +1,6 @@
 const chalk = require('chalk');
 const inquirer = require('inquirer');
-const { unlink } = require('fs').promises;
-const { createReadStream } = require('fs');
+const fs = require('fs');
 const bookshelf = require('../container/bookshelf');
 const saveConf = require('../utils/saveConf');
 
@@ -50,6 +49,15 @@ module.exports = async type => {
   return
 }
 
+function unlink(filePath) {
+  return new Promise((resolve, rejects) => {
+    fs.unlink(filePath, (err) => {
+      if (err) rejects(err);
+      resolve();
+    });
+  })
+}
+
 function uploadBook(book) {
   const axios = require('axios');
   const FormData = require('form-data');
@@ -58,7 +66,7 @@ function uploadBook(book) {
   const maxLen = 1024 * 1024 * 100;
 
   const form = new FormData();
-  form.append('file', createReadStream(book.path));
+  form.append('file', fs.createReadStream(book.path));
 
   return axios.post(global.fishbook.api + '/upload', form, {
     headers: form.getHeaders(),
