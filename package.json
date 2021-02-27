@@ -1,6 +1,6 @@
 {
   "name": "fishbook",
-  "version": "0.2.2",
+  "version": "0.2.3-beta.1",
   "description": "Command line reading fiction.",
   "license": "MIT",
   "bin": {
@@ -15,7 +15,8 @@
     "form-data": "^3.0.0",
     "iconv-lite": "^0.6.2",
     "inquirer": "^7.3.3",
-    "keypress": "^0.2.1"
+    "keypress": "^0.2.1",
+    "tree-kill": "^1.2.2"
   },
   "author": {
     "name": "Ayers",

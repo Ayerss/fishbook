@@ -10,6 +10,7 @@ const bookshelfConf = require(global.fishbook.bookshelfPath);const {
   readingAutoPageTurn
 } = require('../utils/getSetting');
 const spawn = require('child_process').spawn;
+const kill = require('tree-kill');
 
 const osType = require('os').type();
 
@@ -121,7 +122,7 @@ class Read {
         if (this.isPlay) {
           this.start = this.oldStart;
           this.isPlay = false;
-          this.playId.kill('SIGHUP');
+          kill(this.play_process.pid);
         } else {
           this.isPlay = true;
           this.start = this.oldStart;
@@ -139,7 +140,7 @@ class Read {
         if (this.isPlay) {
           this.isPlay = false;
           this.start = this.oldStart;
-          this.playId.kill('SIGHUP');
+          kill(this.play_process.pid);
         };
         this.save(this.oldStart);
         process.stdin.pause();
@@ -176,7 +177,7 @@ class Read {
 
   play(txt) {
     return new Promise((resolve, reject) => {
-      this.playId = osType === 'Darwin'
+      this.play_process = osType === 'Darwin'
         ? spawn('say', [
           '-r',
           '10',
@@ -192,10 +193,10 @@ class Read {
           windowsVerbatimArguments: true
         });
 
-      this.playId.on('close', () => {
+      this.play_process.on('close', () => {
         resolve();
       });
-      this.playId.on('error', (err) => {
+      this.play_process.on('error', (err) => {
         reject(err);
       })
     })
